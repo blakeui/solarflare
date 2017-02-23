@@ -893,7 +893,7 @@ unsigned int ComputeMinWork(unsigned int nBase, int64 nTime)
     return bnResult.GetCompact();
 }
 
-unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlock *pblock)
+unsigned int static GetNextWorkRequired_V1(const CBlockIndex* pindexLast, const CBlock *pblock)
 {
     unsigned int nProofOfWorkLimit = bnProofOfWorkLimit.GetCompact();
 
@@ -954,6 +954,7 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
 	if (nActualTimespan > nTargetTimespan*4)
 		nActualTimespan = nTargetTimespan*4;
 
+
     // Retarget
     CBigNum bnNew;
     bnNew.SetCompact(pindexLast->nBits);
@@ -970,6 +971,87 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     printf("After:  %08x  %s\n", bnNew.GetCompact(), bnNew.getuint256().ToString().c_str());
 
     return bnNew.GetCompact();
+}
+
+unsigned int static DarkGravityWave3(const CBlockIndex* pindexLast, const CBlock *pblock) {
+    /* current difficulty formula, darkcoin - DarkGravity v3, written by Evan Duffield - evan@darkcoin.io */
+    const CBlockIndex *BlockLastSolved = pindexLast;
+    const CBlockIndex *BlockReading = pindexLast;
+    const CBlock *BlockCreating = pblock;
+    BlockCreating = BlockCreating;
+    int64 nActualTimespan = 0;
+    int64 LastBlockTime = 0;
+    int64 PastBlocksMin = 24;
+    int64 PastBlocksMax = 24;
+    int64 CountBlocks = 0;
+    CBigNum PastDifficultyAverage;
+    CBigNum PastDifficultyAveragePrev;
+
+    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMin) { 
+        return bnProofOfWorkLimit.GetCompact(); 
+    }
+        
+    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
+        if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
+        CountBlocks++;
+
+        if(CountBlocks <= PastBlocksMin) {
+            if (CountBlocks == 1) { PastDifficultyAverage.SetCompact(BlockReading->nBits); }
+            else { PastDifficultyAverage = ((PastDifficultyAveragePrev * CountBlocks)+(CBigNum().SetCompact(BlockReading->nBits))) / (CountBlocks+1); }
+            PastDifficultyAveragePrev = PastDifficultyAverage;
+        }
+
+        if(LastBlockTime > 0){
+            int64 Diff = (LastBlockTime - BlockReading->GetBlockTime());
+            nActualTimespan += Diff;
+        }
+        LastBlockTime = BlockReading->GetBlockTime();      
+
+        if (BlockReading->pprev == NULL) { assert(BlockReading); break; }
+        BlockReading = BlockReading->pprev;
+    }
+    
+    CBigNum bnNew(PastDifficultyAverage);
+
+    int64 nTargetTimespan = CountBlocks*nTargetSpacing;
+
+    if (nActualTimespan < nTargetTimespan/3)
+        nActualTimespan = nTargetTimespan/3;
+    if (nActualTimespan > nTargetTimespan*3)
+        nActualTimespan = nTargetTimespan*3;
+
+    // Retarget
+    bnNew *= nActualTimespan;
+    bnNew /= nTargetTimespan;
+	
+	// debug print
+    printf("DarkGravityWave3 RETARGET\n");
+    printf("nTargetTimespan = %"PRI64d"    nActualTimespan = %"PRI64d"\n", nTargetTimespan, nActualTimespan);
+    printf("Before: %08x  %s\n", pindexLast->nBits, CBigNum().SetCompact(pindexLast->nBits).getuint256().ToString().c_str());
+    printf("After:  %08x  %s\n", bnNew.GetCompact(), bnNew.getuint256().ToString().c_str());
+
+    if (bnNew > bnProofOfWorkLimit){
+        bnNew = bnProofOfWorkLimit;
+    }
+     
+    return bnNew.GetCompact();
+}
+
+unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlock *pblock)
+{
+        int DiffMode = 1;
+        if (fTestNet) {
+                if (pindexLast->nHeight+1 >= 10) { DiffMode = 2; }
+        }
+        else {
+				if (pindexLast->nHeight+1 >= 9750) { DiffMode = 2; }
+                else if (pindexLast->nHeight+1 >= 1) { DiffMode = 1; }
+				
+        }
+        
+        if (DiffMode == 1) { return GetNextWorkRequired_V1(pindexLast, pblock); }
+        else if (DiffMode == 2) { return DarkGravityWave3(pindexLast, pblock); }
+        return DarkGravityWave3(pindexLast, pblock);
 }
 
 bool CheckProofOfWork(uint256 hash, unsigned int nBits)
@@ -2003,7 +2085,7 @@ bool LoadBlockIndex(bool fAllowNew)
         pchMessageStart[1] = 0xc0;
         pchMessageStart[2] = 0xb7;
         pchMessageStart[3] = 0xf1;
-        hashGenesisBlock = uint256("0xf6937291bacc8425ddc235e67ef746c3ad4500fa5ddc2695d55f6156bee6d57a");
+        hashGenesisBlock = uint256("0xf57f5277069f2cae3a10653c2ac2d920a7ea8a0db66163e58f48ff1df04b5aa6");
     }
 
     //
@@ -2041,8 +2123,8 @@ bool LoadBlockIndex(bool fAllowNew)
 
 		if (fTestNet)
         {
-            block.nTime    = 1485002473; //Epoch time for testnet
-            block.nNonce   = 146514;
+            block.nTime    = 1485013053; //Epoch time for testnet
+            block.nNonce   = 428713;
         }
 
         //// debug print
