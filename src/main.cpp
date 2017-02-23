@@ -1044,7 +1044,7 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
                 if (pindexLast->nHeight+1 >= 10) { DiffMode = 2; }
         }
         else {
-				if (pindexLast->nHeight+1 >= 9750) { DiffMode = 2; }
+                                if (pindexLast->nHeight+1 >= 9850) { DiffMode = 2; }
                 else if (pindexLast->nHeight+1 >= 1) { DiffMode = 1; }
 				
         }

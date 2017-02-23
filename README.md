@@ -21,10 +21,23 @@ POW Scrypt Cryptocurrency
 240 second block time target
 Coin maturity: 50 confirmations
 
+Example of solarflarecoin.conf file
+
+rpcuser=your_user
+rpcpassword=your_pass
+listen=1
+server=1
+listen=1
+addnode=54.152.17.29
+addnode=84.200.210.86
+addnode=82.211.19.114
+
 Links:
 Official Ann BCT: https://bitcointalk.org/index.php?topic=1747305.0
 Twitter: https://twitter.com/solarflarecoin
-Website: http://solarflarecoin.byethost7.com
+Website: http://solarflarecoin.us
+Slack: https://solarflarecoin.slack.com
+CoinmarketCap: http://coinmarketcap.com/currencies/solarflarecoin/
 
 
 
