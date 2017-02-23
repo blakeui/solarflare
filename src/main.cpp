@@ -1041,7 +1041,7 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
 {
         int DiffMode = 1;
         if (fTestNet) {
-                if (pindexLast->nHeight+1 >= 50) { DiffMode = 2; }
+                if (pindexLast->nHeight+1 >= 10) { DiffMode = 2; }
         }
         else {
 				if (pindexLast->nHeight+1 >= 9750) { DiffMode = 2; }
@@ -2085,7 +2085,7 @@ bool LoadBlockIndex(bool fAllowNew)
         pchMessageStart[1] = 0xc0;
         pchMessageStart[2] = 0xb7;
         pchMessageStart[3] = 0xf1;
-        hashGenesisBlock = uint256("0xf6937291bacc8425ddc235e67ef746c3ad4500fa5ddc2695d55f6156bee6d57a");
+        hashGenesisBlock = uint256("0xf57f5277069f2cae3a10653c2ac2d920a7ea8a0db66163e58f48ff1df04b5aa6");
     }
 
     //
@@ -2123,8 +2123,8 @@ bool LoadBlockIndex(bool fAllowNew)
 
 		if (fTestNet)
         {
-            block.nTime    = 1485002473; //Epoch time for testnet
-            block.nNonce   = 146514;
+            block.nTime    = 1485013053; //Epoch time for testnet
+            block.nNonce   = 428713;
         }
 
         //// debug print
