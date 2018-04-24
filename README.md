@@ -1,4 +1,6 @@
 SolarFlare - a decentralised public blockchain and cryptocurrency project.
+-----------------------------------------------------------------
+
 
 The coin uses the scrypt as a proof-of-work algorithm and will be issued in 20 million total coins supply.
  
