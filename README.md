@@ -42,3 +42,6 @@ Copyright (c) 2011-2012 Litecoin Developers
 Copyright (c) 2017 Solarflarecoin Developers
 Distributed under the MIT/X11 software license, see the accompanying
 
+
+
+Blakeui 2018
