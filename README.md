@@ -45,3 +45,4 @@ Distributed under the MIT/X11 software license, see the accompanying
 
 
 Blakeui 2018
+https://bitcointalk.org/index.php?topic=3385763.0
